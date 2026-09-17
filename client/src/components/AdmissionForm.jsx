@@ -1,105 +1,109 @@
-import { useState } from "react";
+import React, { useState } from "react";
 
+// Controlled form. All fields live in one state object.
+// On submit, it validates required fields and — if valid —
+// passes the collected data up to App via the onSubmit prop.
 function AdmissionForm({ onSubmit }) {
-
   const [formData, setFormData] = useState({
-    name: "",
+    applicantName: "",
     email: "",
     phone: "",
     dob: "",
     course: "",
-    address: ""
+    address: "",
   });
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
+  const [error, setError] = useState("");
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  function handleChange(e) {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  }
 
-    if (
-      !formData.name ||
-      !formData.email ||
-      !formData.phone ||
-      !formData.dob ||
-      !formData.course ||
-      !formData.address
-    ) {
-      alert("Please fill all the fields.");
+  function handleSubmit(e) {
+    e.preventDefault(); // stop the page from reloading
+
+    // Basic validation — every field is required
+    const isEmpty = Object.values(formData).some((value) => value.trim() === "");
+    if (isEmpty) {
+      setError("Please fill in all fields before submitting.");
       return;
     }
 
-    onSubmit(formData);
-  };
+    setError("");
+    onSubmit(formData); // hand the finished data up to App
+  }
 
   return (
-    <section className="form-section">
+    <section className="admission-form-section">
+      <h2>Admission Application Form</h2>
+      <form className="admission-form" onSubmit={handleSubmit}>
+        <label>
+          Applicant Name
+          <input
+            type="text"
+            name="applicantName"
+            value={formData.applicantName}
+            onChange={handleChange}
+          />
+        </label>
 
-      <h2>Admission Form</h2>
+        <label>
+          Email
+          <input
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+          />
+        </label>
 
-      <form onSubmit={handleSubmit}>
+        <label>
+          Phone
+          <input
+            type="tel"
+            name="phone"
+            value={formData.phone}
+            onChange={handleChange}
+          />
+        </label>
 
-        <label>Applicant Name</label>
-        <input
-          type="text"
-          name="name"
-          value={formData.name}
-          onChange={handleChange}
-        />
+        <label>
+          Date of Birth
+          <input
+            type="date"
+            name="dob"
+            value={formData.dob}
+            onChange={handleChange}
+          />
+        </label>
 
-        <label>Email</label>
-        <input
-          type="email"
-          name="email"
-          value={formData.email}
-          onChange={handleChange}
-        />
+        <label className="full-width">
+          Course
+          <select name="course" value={formData.course} onChange={handleChange}>
+            <option value="">-- Select a course --</option>
+            <option value="BCA">BCA</option>
+            <option value="MCA">MCA</option>
+            <option value="BBA">BBA</option>
+          </select>
+        </label>
 
-        <label>Phone</label>
-        <input
-          type="tel"
-          name="phone"
-          value={formData.phone}
-          onChange={handleChange}
-        />
+        <label className="full-width">
+          Address
+          <textarea
+            name="address"
+            value={formData.address}
+            onChange={handleChange}
+            rows={3}
+          />
+        </label>
 
-        <label>Date of Birth</label>
-        <input
-          type="date"
-          name="dob"
-          value={formData.dob}
-          onChange={handleChange}
-        />
+        {error && <p className="form-error full-width">{error}</p>}
 
-        <label>Course</label>
-        <select
-          name="course"
-          value={formData.course}
-          onChange={handleChange}
-        >
-          <option value="">Select Course</option>
-          <option value="BCA">BCA</option>
-          <option value="BBA">BBA</option>
-          <option value="MCA">MCA</option>
-        </select>
-
-        <label>Address</label>
-        <textarea
-          name="address"
-          value={formData.address}
-          onChange={handleChange}
-        ></textarea>
-
-        <button type="submit">
+        <button type="submit" className="full-width">
           Submit Application
         </button>
-
       </form>
-
     </section>
   );
 }
